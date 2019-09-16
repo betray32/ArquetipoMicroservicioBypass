@@ -1,0 +1,11 @@
+# Archivo para la logica de negocio del archivo
+
+VersionMicroservicio: 0.0.1
+
+Procedures:
+  ConsultaCliente: [PROCEDURE]
+
+Endpoints:
+  ConsultaAutenticacionCliente: [ENDPOINT]
+  
+  
