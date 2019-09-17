@@ -1,10 +1,10 @@
-package cl.poc.microservicio.camel;
+package cl.poc.sb.bypass.camel;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.springframework.stereotype.Component;
 
-import cl.poc.microservicio.bean.Employee;
+import cl.poc.sb.bypass.bean.Employee;
 
 /**
  * Ejemplo de clase que implementa un procesador de manera externa, al momento

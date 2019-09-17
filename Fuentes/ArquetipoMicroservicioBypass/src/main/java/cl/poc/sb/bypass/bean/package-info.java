@@ -1,4 +1,4 @@
 /**
  * Se definen los beans a utilizar
  */
-package cl.poc.microservicio.bean;
+package cl.poc.sb.bypass.bean;

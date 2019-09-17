@@ -6,4 +6,4 @@
  * una integracion a modo de bypass; sin embargo camel permite realizar
  * integraciones mediante plugins ante una completa gama de escenarios posibles
  */
-package cl.poc.microservicio.camel;
+package cl.poc.sb.bypass.camel;

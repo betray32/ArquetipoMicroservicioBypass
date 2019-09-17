@@ -1,4 +1,4 @@
-package cl.poc.microservicio.helper;
+package cl.poc.sb.bypass.helper;
 
 import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;

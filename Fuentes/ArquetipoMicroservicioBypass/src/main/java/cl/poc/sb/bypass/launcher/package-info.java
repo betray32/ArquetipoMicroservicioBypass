@@ -3,4 +3,4 @@
  * caso de requerirlo ejecuciones automaticas al momento de iniciar el
  * microservicio
  */
-package cl.poc.microservicio.launcher;
+package cl.poc.sb.bypass.launcher;

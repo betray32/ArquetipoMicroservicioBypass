@@ -112,7 +112,7 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
-					<mainClass>cl.poc.microservicio.launcher.ArquetipoMicroservicioByPassApplication</mainClass>
+					<mainClass>cl.poc.sb.launcher.bypass.ArquetipoMicroservicioByPassApplication</mainClass>
 				</configuration>
 			</plugin>
 			

@@ -1,4 +1,4 @@
-package cl.poc.microservicio.bean;
+package cl.poc.sb.bypass.bean;
 
 /**
  * Ejemplo de estructura de entrada para un endpoint post

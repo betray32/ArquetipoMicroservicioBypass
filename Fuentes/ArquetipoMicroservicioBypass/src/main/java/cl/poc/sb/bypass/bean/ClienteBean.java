@@ -1,4 +1,4 @@
-package cl.poc.microservicio.bean;
+package cl.poc.sb.bypass.bean;
 
 /**
  * Pojo para el cliente

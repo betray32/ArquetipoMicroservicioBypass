@@ -3,4 +3,4 @@
  * deben de realizar orquestaciones y/o llamadas a otros elementos de data tales
  * como bases de datos por ejemplo
  */
-package cl.poc.microservicio.delegate;
+package cl.poc.sb.bypass.delegate;
