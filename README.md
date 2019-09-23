@@ -7,3 +7,8 @@ Arquetipo de microservicio el cual sirve especialmente para encapsular servicios
 # Tecnologías Utilizadas
 - Spring Boot
 - Camel
+
+# Testing
+Favor probar con
+
+> curl http://localhost:8081/CamelBypass/api/Get
