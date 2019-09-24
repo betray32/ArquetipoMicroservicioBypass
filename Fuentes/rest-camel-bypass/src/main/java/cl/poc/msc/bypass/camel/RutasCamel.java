@@ -27,7 +27,7 @@ public class RutasCamel extends RouteBuilder {
 		.consumes("application/json")
 		.produces("application/json")
 		
-		.get("/Saludo").outType(Greetings.class)
+		.get("Saludo").outType(Greetings.class)
         .responseMessage().code(200).endResponseMessage()
 		.to("direct:saludoImpl");
 		
