@@ -1,6 +1,6 @@
 package cl.poc.msc.bypass.mgr;
 
-import cl.poc.msc.bypass.bean.Greetings;
+import cl.poc.msc.bypass.bean.Saludo;
 
 /**
  * GreetingsService - Definicion
@@ -8,13 +8,13 @@ import cl.poc.msc.bypass.bean.Greetings;
  * @author ccontrerasc
  *
  */
-public interface GreetingsService {
+public interface DelegateService {
 
 	/**
 	 * Generate Greetings
 	 *
 	 * @return a string greetings
 	 */
-	public Greetings getGreetings();
+	public Saludo salidaGet();
 
 }
