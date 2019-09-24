@@ -23,14 +23,14 @@ public class RutasCamel extends RouteBuilder {
 		/*
 		 * Ejemplo de rutina exponiendo un servicio GET
 		 */
-		rest().description("Servicio GET de saludo  - Definicion")
+		rest("Ejemplos")
+		.description("Servicio GET de saludo  - Definicion")
 		.consumes("application/json")
 		.produces("application/json")
 		
 		.get("Saludo").outType(Greetings.class)
-        .responseMessage().code(200).endResponseMessage()
-		.to("direct:saludoImpl");
-		
+        	.responseMessage().code(200).endResponseMessage()
+        	.to("direct:saludoImpl");
 		
 		 from("direct:saludoImpl").description("Servicio GET de saludo - Implementacion")
 		 .streamCaching()
