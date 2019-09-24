@@ -20,16 +20,12 @@ public class RutasCamel extends RouteBuilder {
 	@Override
 	public void configure() throws Exception {
 
-		/*
-		 * Ejemplo de rutina exponiendo un servicio GET
-		 */
 		rest("Ejemplos")
-		.description("Servicio GET de saludo  - Definicion")
-		.consumes("application/json")
-		.produces("application/json")
+			.consumes("application/json")
+			.produces("application/json")
 		
-		.get("Saludo").outType(Greetings.class)
-        	.responseMessage().code(200).endResponseMessage()
+		.get("Get").description("Servicio GET de saludo  - Definicion")
+			.outType(Greetings.class)
         	.to("direct:saludoImpl");
 		
 		 from("direct:saludoImpl").description("Servicio GET de saludo - Implementacion")
