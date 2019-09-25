@@ -1,5 +1,6 @@
 package cl.poc.msc.bypass.mgr;
 
+import cl.poc.msc.bypass.bean.PersonaInput;
 import cl.poc.msc.bypass.bean.SaludoOutput;
 
 /**
@@ -24,5 +25,13 @@ public interface DelegateService {
 	 * @return
 	 */
 	public SaludoOutput salidaGetParam(String param);
+
+	/**
+	 * Salida para el recurso POST
+	 * 
+	 * @param input
+	 * @return
+	 */
+	public SaludoOutput salidaPost(PersonaInput input);
 
 }

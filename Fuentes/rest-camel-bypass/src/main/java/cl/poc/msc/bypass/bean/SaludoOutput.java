@@ -1,7 +1,7 @@
 package cl.poc.msc.bypass.bean;
 
 /**
- * Dto de saludo
+ * Dto de saludo input
  * 
  * @author ccontrerasc
  *

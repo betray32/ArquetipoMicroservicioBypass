@@ -4,6 +4,8 @@ import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.rest.RestParamType;
 import org.springframework.stereotype.Component;
 
+import cl.poc.msc.bypass.bean.PersonaInput;
+import cl.poc.msc.bypass.bean.SalidaGenerica;
 import cl.poc.msc.bypass.bean.SaludoOutput;
 
 /**
@@ -29,10 +31,11 @@ public class RutasCamel extends RouteBuilder {
 		 * 
 		 * URL: localhost:8081/CamelBypass/api/Ejemplos/Get
 		 */
-		.get("Get").outType(SaludoOutput.class)
-			.description("Servicio GET Ejemplo- Sin parametros de entrada y responde un objeto")
+		.get("Get")
+		.outType(SaludoOutput.class)
+		.description("Servicio GET Ejemplo- Sin parametros de entrada y responde un objeto")
 			/*
-			 * Documentacion del servicio, se documenta la salida
+			 * Documentacion de salida
 			 */
 			.responseMessage().code(200).responseModel(SaludoOutput.class).endResponseMessage()
 		.to("direct:responseGET")
@@ -43,15 +46,16 @@ public class RutasCamel extends RouteBuilder {
 		 * 
 		 * URL: localhost:8081/CamelBypass/api/Ejemplos/GetParam/Camilo
 		 */
-		.get("GetParam/{nombre}").outType(SaludoOutput.class)
+		.get("GetParam/{nombre}")
+		.outType(SaludoOutput.class)
+		.description("Servicio GET Ejemplo - Un parametro de entrada y un objeto de salida")
 			/*
-			 * Documentacion del servicio, se documenta la entrada y la salida
+			 * Documentacion de entrada
 			 */
-			.description("Servicio GET Ejemplo - Un parametro de entrada y un objeto de salida")
 			.param().name("nombre").type(RestParamType.path).description("Nombre del usuario, ejemplo")
 			.required(true).dataType("String").endParam()
 			/*
-			 * Salida
+			 * Documentacion de salida
 			 */
 			.responseMessage().code(200).responseModel(SaludoOutput.class).endResponseMessage()
 		.to("direct:responseGETParam")
@@ -62,7 +66,23 @@ public class RutasCamel extends RouteBuilder {
 		 * 
 		 * URL:
 		 */
-		
+		.post("Post")
+		.type(PersonaInput.class)
+		.outType(SaludoOutput.class)
+		.description("Servicio POST Ejemplo - Recibe un objeto y devuelve otro")
+			/*
+			 * Documentacion de entrada
+			 */
+			.param().name("Cliente").type(RestParamType.body).description("Cliente a consultar")
+			.required(true).dataType("Object").endParam()
+			.responseMessage().code(200).responseModel(SalidaGenerica.class).endResponseMessage()
+			.responseMessage().code(400).responseModel(SalidaGenerica.class).message("Unexpected body").endResponseMessage()
+			.responseMessage().code(500).responseModel(SalidaGenerica.class).endResponseMessage()
+			/*
+			 * Documentacion de salida
+			 */
+			.responseMessage().code(200).responseModel(SaludoOutput.class).endResponseMessage()
+		.to("direct:responsePOST")
 		;
 
 		/**
@@ -83,6 +103,13 @@ public class RutasCamel extends RouteBuilder {
 		from("direct:responseGETParam")
 			.description("Servicio GET con parametro - Implementacion")
 			.to("bean:delegateService?method=salidaGetParam(${header.nombre})");
+		
+		/**************************************************************************
+		 * Rutina para el servicio POST
+		 */
+		from("direct:responsePOST")
+			.description("Servicio POST - Implementacion")
+			.to("bean:delegateService?method=salidaPost(${body})");
 		;
 
 
