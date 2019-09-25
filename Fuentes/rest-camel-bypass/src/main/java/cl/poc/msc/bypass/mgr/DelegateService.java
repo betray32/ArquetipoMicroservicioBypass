@@ -1,6 +1,6 @@
 package cl.poc.msc.bypass.mgr;
 
-import cl.poc.msc.bypass.bean.Saludo;
+import cl.poc.msc.bypass.bean.SaludoOutput;
 
 /**
  * GreetingsService - Definicion
@@ -11,10 +11,18 @@ import cl.poc.msc.bypass.bean.Saludo;
 public interface DelegateService {
 
 	/**
-	 * Generate Greetings
+	 * Salida para el recurso GET
 	 *
 	 * @return a string greetings
 	 */
-	public Saludo salidaGet();
+	public SaludoOutput salidaGet();
+
+	/**
+	 * Salida para el recurso GET con parametro
+	 * 
+	 * @param param
+	 * @return
+	 */
+	public SaludoOutput salidaGetParam(String param);
 
 }

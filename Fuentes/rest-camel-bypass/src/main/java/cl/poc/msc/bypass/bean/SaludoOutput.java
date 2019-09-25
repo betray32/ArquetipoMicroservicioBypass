@@ -6,10 +6,11 @@ package cl.poc.msc.bypass.bean;
  * @author ccontrerasc
  *
  */
-public class Saludo {
+public class SaludoOutput {
 
 	private String origen;
 	private String mensaje;
+	private String author;
 
 	/** GET Y SET **/
 	public String getOrigen() {
@@ -28,9 +29,17 @@ public class Saludo {
 		this.mensaje = mensaje;
 	}
 
+	public String getAuthor() {
+		return author;
+	}
+
+	public void setAuthor(String author) {
+		this.author = author;
+	}
+
 	@Override
 	public String toString() {
-		return "Saludo [origen=" + origen + ", mensaje=" + mensaje + "]";
+		return "Saludo [origen=" + origen + ", mensaje=" + mensaje + ", author=" + author + "]";
 	}
 
 }

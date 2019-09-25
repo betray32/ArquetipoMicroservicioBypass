@@ -1,9 +1,10 @@
 package cl.poc.msc.bypass.camel;
 
 import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.model.rest.RestParamType;
 import org.springframework.stereotype.Component;
 
-import cl.poc.msc.bypass.bean.Saludo;
+import cl.poc.msc.bypass.bean.SaludoOutput;
 
 /**
  * Rutinas camel
@@ -22,29 +23,68 @@ public class RutasCamel extends RouteBuilder {
 
 		rest("Ejemplos").consumes("application/json").produces("application/json")
 
-		/*
+		/*******************************************************************************
 		 * Servicio Get de ejemplo, no recibe parametros y devuelve un objeto complejo
 		 * de salida, realiza una implementacion hacia un servicio controlador externo
 		 * 
-		 * URL: URL: http://localhost:8081/CamelBypass/api/Ejemplos/Get
+		 * URL: localhost:8081/CamelBypass/api/Ejemplos/Get
 		 */
-		.get("Get")
-			.description("Servicio GET de saludo - Sin parametros de entrada y responde un objeto")
-			.outType(Saludo.class)
-		.to("direct:responseGET");
-
-		from("direct:responseGET")
-			.description("Servicio GET de saludo - Implementacion")
+		.get("Get").outType(SaludoOutput.class)
+			.description("Servicio GET Ejemplo- Sin parametros de entrada y responde un objeto")
 			/*
-			 * streamCaching - Definicion: 
-			 * While stream types (like StreamSource, InputStream and Reader) are commonly
-			 * used in messaging for performance reasons, they also have an important
-			 * drawback: they can only be read once. In order to be able to work with
-			 * message content multiple times, the stream needs to be cached.
+			 * Documentacion del servicio, se documenta la salida
 			 */
-			.streamCaching()
+			.responseMessage().code(200).responseModel(SaludoOutput.class).endResponseMessage()
+		.to("direct:responseGET")
+		
+		/*******************************************************************************
+		 * Servicio Get de ejemplo, recibe un parametro de entrada y devuelve un objeto 
+		 * complejo de salida
+		 * 
+		 * URL: localhost:8081/CamelBypass/api/Ejemplos/GetParam/Camilo
+		 */
+		.get("GetParam/{nombre}").outType(SaludoOutput.class)
+			/*
+			 * Documentacion del servicio, se documenta la entrada y la salida
+			 */
+			.description("Servicio GET Ejemplo - Un parametro de entrada y un objeto de salida")
+			.param().name("nombre").type(RestParamType.path).description("Nombre del usuario, ejemplo")
+			.required(true).dataType("String").endParam()
+			/*
+			 * Salida
+			 */
+			.responseMessage().code(200).responseModel(SaludoOutput.class).endResponseMessage()
+		.to("direct:responseGETParam")
+		
+		/*******************************************************************************
+		 * Servicio POST de ejemplo, recibe un objeto complejo de entrada y devuelve
+		 * otro de salida
+		 * 
+		 * URL:
+		 */
+		
+		;
+
+		/**
+		 * Interceptores, desde aca entran los flujos desde los distintos endpoints y se realiza
+		 * la logica de negocio respectiva de salida
+		 */
+		
+		/**************************************************************************
+		 * Rutina para el servicio GET
+		 */
+		from("direct:responseGET")
+			.description("Servicio GET - Implementacion")
 		.to("bean:delegateService?method=salidaGet");
-		/********************************************************/
+		
+		/**************************************************************************
+		 * Rutina para el servicio GET con parametro
+		 */
+		from("direct:responseGETParam")
+			.description("Servicio GET con parametro - Implementacion")
+			.to("bean:delegateService?method=salidaGetParam(${header.nombre})");
+		;
+
 
 	}
 }

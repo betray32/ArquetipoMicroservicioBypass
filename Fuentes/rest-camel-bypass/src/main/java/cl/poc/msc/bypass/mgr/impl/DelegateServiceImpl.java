@@ -2,7 +2,7 @@ package cl.poc.msc.bypass.mgr.impl;
 
 import org.springframework.stereotype.Service;
 
-import cl.poc.msc.bypass.bean.Saludo;
+import cl.poc.msc.bypass.bean.SaludoOutput;
 import cl.poc.msc.bypass.mgr.DelegateService;
 
 /**
@@ -15,14 +15,28 @@ import cl.poc.msc.bypass.mgr.DelegateService;
 public class DelegateServiceImpl implements DelegateService {
 
 	/**
-	 * Saludar
+	 * Salida para el recurso GET
 	 */
 	@Override
-	public Saludo salidaGet() {
+	public SaludoOutput salidaGet() {
 
-		Saludo salida = new Saludo();
+		SaludoOutput salida = new SaludoOutput();
 		salida.setOrigen("CAMEL REST API");
 		salida.setMensaje("Invocando desde rest api camel");
+		salida.setAuthor("SPRING BOOT");
+
+		return salida;
+	}
+
+	/**
+	 * Salida para el recurso GET con parametro
+	 */
+	@Override
+	public SaludoOutput salidaGetParam(String param) {
+		SaludoOutput salida = new SaludoOutput();
+		salida.setOrigen("CAMEL REST API");
+		salida.setMensaje("Invocando desde rest api camel con parametro");
+		salida.setAuthor(param);
 
 		return salida;
 	}
