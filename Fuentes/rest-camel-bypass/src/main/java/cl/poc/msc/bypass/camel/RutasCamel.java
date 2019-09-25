@@ -1,8 +1,11 @@
 package cl.poc.msc.bypass.camel;
 
+import java.math.BigDecimal;
+
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.component.cxf.common.message.CxfConstants;
 import org.apache.camel.component.jackson.JacksonDataFormat;
 import org.apache.camel.model.rest.RestParamType;
 import org.springframework.http.HttpMethod;
@@ -21,11 +24,18 @@ import cl.poc.msc.bypass.bean.SaludoOutput;
  */
 @Component
 public class RutasCamel extends RouteBuilder {
-	
+
 	/**
-	 * Endpoint para el servicio GET
+	 * Endpoint para el servicio GET de bypass
 	 */
 	private static final String ENDPOINT_GETBYPASS = "http://localhost:8080/employee?id=5";
+	
+	/**
+	 * Endpoint POST de ejemplo para su invocacion desde apache camel
+	 */
+	private static final String SOAP_URL = "http://www.dataaccess.com/webservicesserver/NumberConversion.wso/";
+	private static final String SOAP_NAMESPACE = "http://www.dataaccess.com/webservicesserver/";
+	private static final String SOAP_OPERATION = "NumberToDollars";
 
 	/**
 	 * Configuracion de camel
@@ -106,7 +116,15 @@ public class RutasCamel extends RouteBuilder {
 			 * Documentacion de salida
 			 */
 			.responseMessage().code(200).responseModel(SaludoOutput.class).endResponseMessage()
-		.to("direct:responsePOST")
+		.to("direct:responsePost")
+		
+		/*******************************************************************************
+		 * Servicio POST REST de ejemplo, que llama a otro servicio del tipo SOAP
+		 * 
+		 * URL: 
+		 */
+		.get("PostBypass")		
+			.to("direct:responsePostBypass")
 		;
 
 		/**
@@ -131,7 +149,7 @@ public class RutasCamel extends RouteBuilder {
 		/**************************************************************************
 		 * Rutina para el servicio POST
 		 */
-		from("direct:responsePOST")
+		from("direct:responsePost")
 			.description("Servicio POST - Implementacion")
 			.to("bean:delegateService?method=salidaPost(${body})");
 		
@@ -143,7 +161,7 @@ public class RutasCamel extends RouteBuilder {
 			 * Al llamar a otra api en modo de bypass, se deben de eliminar los 
 			 * headers caso contrario no funcionara la rutina
 			 */
-		 	.removeHeaders("CamelHttp*")
+		 	.removeHeaders("*")
 			/*
 			 * Se indica las cabeceras y tipos a consultar
 			 */
@@ -175,8 +193,32 @@ public class RutasCamel extends RouteBuilder {
 			/*
 			 * Se finaliza esta rutina
 			 */
-			.end()
+			.end();
 
+		/**************************************************************************
+		 *  Rutina para el servicio Post hacia SOAP
+		 */
+		from("direct:responsePostBypass")
+			.process(new Processor() {
+				@Override
+				public void process(Exchange exchange) throws Exception {
+					exchange.getIn().setBody(new BigDecimal(5));
+				}
+			})
+			.log("Request > ${body}")
+			/*
+			 * Al llamar a otra api en modo de bypass, se deben de eliminar los 
+			 * headers caso contrario no funcionara la rutina
+			 */
+		 	.removeHeaders("*")
+		 	.setHeader(CxfConstants.OPERATION_NAME, constant(SOAP_OPERATION))
+		 	.setHeader(CxfConstants.OPERATION_NAMESPACE, constant(SOAP_NAMESPACE))
+		 	
+		 	 // Invoke our test service using CXF
+            .to("cxf://"+SOAP_URL+""
+                    + "?serviceClass=com.dataaccess.webservicesserver.NumberConversionSoapType"
+                    + "&wsdlURL=/wsdl/NumberConversion.wsdl")
+			
 		;
 
 

@@ -74,6 +74,13 @@
 			<version>4.2</version>
 		</dependency>
 
+		<!-- Para generar cliente soap por maven -->
+		<dependency>
+			<groupId>org.codehaus.woodstox</groupId>
+			<artifactId>woodstox-core-asl</artifactId>
+			<version>4.4.1</version>
+		</dependency>
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
@@ -113,6 +120,29 @@
 								<source>src/main/clienteservicios</source>
 							</sources>
 						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!-- Generar Cliente SOAP -->
+			<plugin>
+				<groupId>org.apache.cxf</groupId>
+				<artifactId>cxf-codegen-plugin</artifactId>
+				<version>3.3.3</version>
+				<executions>
+					<execution>
+						<id>generate-sources</id>
+						<phase>generate-sources</phase>
+						<configuration>
+							<wsdlOptions>
+								<wsdlOption>
+									<wsdl>src/main/resources/wsdl/NumberConversion.wsdl</wsdl>
+								</wsdlOption>
+							</wsdlOptions>
+						</configuration>
+						<goals>
+							<goal>wsdl2java</goal>
+						</goals>
 					</execution>
 				</executions>
 			</plugin>
