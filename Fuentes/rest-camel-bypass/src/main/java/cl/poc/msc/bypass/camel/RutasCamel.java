@@ -16,6 +16,7 @@ import cl.poc.msc.bypass.bean.Employee;
 import cl.poc.msc.bypass.bean.PersonaInput;
 import cl.poc.msc.bypass.bean.SalidaGenerica;
 import cl.poc.msc.bypass.bean.SaludoOutput;
+import cl.poc.msc.bypass.bean.SoapRequest;
 import cl.poc.msc.bypass.bean.SoapResponse;
 
 /**
@@ -109,7 +110,7 @@ public class RutasCamel extends RouteBuilder {
 			/*
 			 * Documentacion de entrada
 			 */
-			.param().name("Cliente").type(RestParamType.body).description("Cliente a consultar")
+			.param().name("PersonaInput").type(RestParamType.body).description("Cliente a consultar")
 			.required(true).dataType("Object").endParam()
 			.responseMessage().code(200).responseModel(SalidaGenerica.class).endResponseMessage()
 			.responseMessage().code(400).responseModel(SalidaGenerica.class).message("Unexpected body").endResponseMessage()
@@ -125,8 +126,23 @@ public class RutasCamel extends RouteBuilder {
 		 * 
 		 * URL: 
 		 */
-		.get("PostBypass")		
-			.to("direct:responsePostBypass")
+		.post("PostBypass")
+		.type(SoapRequest.class)
+		.outType(SoapResponse.class)
+		.description("Servicio Post de ejemplo, permite llamar mediante camel y cxf un servicio SOAP")
+			/*
+			 * Documentacion de entrada
+			 */
+			.param().name("SoapRequest").type(RestParamType.body).description("Cantidad a transformar")
+			.required(true).dataType("Object").endParam()
+			.responseMessage().code(200).responseModel(SalidaGenerica.class).endResponseMessage()
+			.responseMessage().code(400).responseModel(SalidaGenerica.class).message("Unexpected body").endResponseMessage()
+			.responseMessage().code(500).responseModel(SalidaGenerica.class).endResponseMessage()
+			/*
+			 * Documentacion de salida
+			 */
+			.responseMessage().code(200).responseModel(SoapResponse.class).endResponseMessage()
+		.to("direct:responsePostBypass")
 		;
 
 		/**
@@ -139,21 +155,24 @@ public class RutasCamel extends RouteBuilder {
 		 */
 		from("direct:responseGET")
 			.description("Servicio GET - Implementacion")
-		.to("bean:delegateService?method=salidaGet");
+			.to("bean:delegateService?method=salidaGet")
+			.log("Response > ${body}");
 		
 		/**************************************************************************
 		 * Rutina para el servicio GET con parametro
 		 */
 		from("direct:responseGETParam")
 			.description("Servicio GET con parametro - Implementacion")
-			.to("bean:delegateService?method=salidaGetParam(${header.nombre})");
+			.to("bean:delegateService?method=salidaGetParam(${header.nombre})")
+			.log("Response > ${body}");
 		
 		/**************************************************************************
 		 * Rutina para el servicio POST
 		 */
 		from("direct:responsePost")
 			.description("Servicio POST - Implementacion")
-			.to("bean:delegateService?method=salidaPost(${body})");
+			.to("bean:delegateService?method=salidaPost(${body})")
+			.log("Response > ${body}");
 		
 		/**************************************************************************
 		 *  Rutina para el servicio Get de bypass
@@ -201,10 +220,15 @@ public class RutasCamel extends RouteBuilder {
 		 *  Rutina para el servicio Post hacia SOAP
 		 */
 		from("direct:responsePostBypass")
+			/*
+			 * Se toma el request de entrada del servicio REST y se transforma hacia
+			 * el request del servicio SOAP
+			 */
 			.process(new Processor() {
 				@Override
 				public void process(Exchange exchange) throws Exception {
-					exchange.getIn().setBody(new BigDecimal(5));
+					SoapRequest request = (SoapRequest) exchange.getIn().getBody();
+					exchange.getIn().setBody(new BigDecimal(request.getNumero()));
 				}
 			})
 			.log("Request > ${body}")
@@ -213,15 +237,21 @@ public class RutasCamel extends RouteBuilder {
 			 * headers caso contrario no funcionara la rutina
 			 */
 		 	.removeHeaders("*")
+		 	/*
+		 	 * Se especifican el operation name y el operation namespace 
+		 	 */
 		 	.setHeader(CxfConstants.OPERATION_NAME, constant(SOAP_OPERATION))
 		 	.setHeader(CxfConstants.OPERATION_NAMESPACE, constant(SOAP_NAMESPACE))
 		 	
-		 	 // Invocar el soap con CXF
+		 	 // Invocar el servicio SOAP con CXF
             .to("cxf://"+SOAP_URL+""
                     + "?serviceClass=com.dataaccess.webservicesserver.NumberConversionSoapType"
                     + "&wsdlURL=/wsdl/NumberConversion.wsdl")
             
             .log("Response > ${body}")
+            /*
+             * Obtener la salida y convertirla para mostrarla en el rest
+             */
             .process(new Processor() {
 				@Override
 				public void process(Exchange exchange) throws Exception {
