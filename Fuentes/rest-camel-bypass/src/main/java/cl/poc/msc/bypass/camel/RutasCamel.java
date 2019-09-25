@@ -8,6 +8,7 @@ import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.cxf.common.message.CxfConstants;
 import org.apache.camel.component.jackson.JacksonDataFormat;
 import org.apache.camel.model.rest.RestParamType;
+import org.apache.cxf.message.MessageContentsList;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 
@@ -15,6 +16,7 @@ import cl.poc.msc.bypass.bean.Employee;
 import cl.poc.msc.bypass.bean.PersonaInput;
 import cl.poc.msc.bypass.bean.SalidaGenerica;
 import cl.poc.msc.bypass.bean.SaludoOutput;
+import cl.poc.msc.bypass.bean.SoapResponse;
 
 /**
  * Rutinas camel
@@ -214,10 +216,20 @@ public class RutasCamel extends RouteBuilder {
 		 	.setHeader(CxfConstants.OPERATION_NAME, constant(SOAP_OPERATION))
 		 	.setHeader(CxfConstants.OPERATION_NAMESPACE, constant(SOAP_NAMESPACE))
 		 	
-		 	 // Invoke our test service using CXF
+		 	 // Invocar el soap con CXF
             .to("cxf://"+SOAP_URL+""
                     + "?serviceClass=com.dataaccess.webservicesserver.NumberConversionSoapType"
                     + "&wsdlURL=/wsdl/NumberConversion.wsdl")
+            
+            .log("Response > ${body}")
+            .process(new Processor() {
+				@Override
+				public void process(Exchange exchange) throws Exception {
+					MessageContentsList respuestaSoap = (MessageContentsList) exchange.getIn().getBody();
+					String dolares = (String) respuestaSoap.get(0);
+					exchange.getOut().setBody(new SoapResponse(dolares));
+				}
+			})
 			
 		;
 
