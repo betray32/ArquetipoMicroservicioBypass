@@ -8,8 +8,10 @@ Arquetipo de microservicio el cual sirve especialmente para encapsular servicios
 # Tecnologías Utilizadas
 - Spring Boot
 - Camel
+- CXF
 
 # Testing
-Favor probar con
+Utilizar el archivo de SoapUI adjunto
 
-> curl http://localhost:8081/CamelBypass/api/Get
+# Compilar Fuentes autogenerados
+> mvn generate-sources
