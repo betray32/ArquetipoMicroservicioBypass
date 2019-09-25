@@ -1,9 +1,14 @@
 package cl.poc.msc.bypass.camel;
 
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
 import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.component.jackson.JacksonDataFormat;
 import org.apache.camel.model.rest.RestParamType;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 
+import cl.poc.msc.bypass.bean.Employee;
 import cl.poc.msc.bypass.bean.PersonaInput;
 import cl.poc.msc.bypass.bean.SalidaGenerica;
 import cl.poc.msc.bypass.bean.SaludoOutput;
@@ -16,6 +21,11 @@ import cl.poc.msc.bypass.bean.SaludoOutput;
  */
 @Component
 public class RutasCamel extends RouteBuilder {
+	
+	/**
+	 * Endpoint para el servicio GET
+	 */
+	private static final String ENDPOINT_GETBYPASS = "http://localhost:8080/employee?id=5";
 
 	/**
 	 * Configuracion de camel
@@ -61,10 +71,24 @@ public class RutasCamel extends RouteBuilder {
 		.to("direct:responseGETParam")
 		
 		/*******************************************************************************
+		 * Servicio Get de ejemplo, ejemplo de bypass para otro servicio rest
+		 * 
+		 * URL: http://localhost:8081/CamelBypass/api/Ejemplos/GetBypass
+		 */
+		.get("GetBypass")
+		.outType(Employee.class)
+		.description("Servicio GET para bypass - permite encapsular la llamada hacia otro recurso rest")
+			/*
+			 * Documentacion de salida
+			 */
+			.responseMessage().code(200).responseModel(Employee.class).endResponseMessage()
+		.to("direct:responseGetBypass")
+		
+		/*******************************************************************************
 		 * Servicio POST de ejemplo, recibe un objeto complejo de entrada y devuelve
 		 * otro de salida
 		 * 
-		 * URL:
+		 * URL: http://localhost:8081/CamelBypass/api/Ejemplos/Post
 		 */
 		.post("Post")
 		.type(PersonaInput.class)
@@ -110,6 +134,49 @@ public class RutasCamel extends RouteBuilder {
 		from("direct:responsePOST")
 			.description("Servicio POST - Implementacion")
 			.to("bean:delegateService?method=salidaPost(${body})");
+		
+		/**************************************************************************
+		 *  Rutina para el servicio Get de bypass
+		 */
+		from("direct:responseGetBypass")
+			/*
+			 * Al llamar a otra api en modo de bypass, se deben de eliminar los 
+			 * headers caso contrario no funcionara la rutina
+			 */
+		 	.removeHeaders("CamelHttp*")
+			/*
+			 * Se indica las cabeceras y tipos a consultar
+			 */
+			.setHeader(Exchange.HTTP_METHOD, simple(HttpMethod.GET.name()))
+			.setHeader(Exchange.CONTENT_TYPE, constant("application/json"))
+			/*
+			 * Endpoint de destino a consultar
+			 */
+			.to(ENDPOINT_GETBYPASS)
+			/*
+			 * Se especifica que se desea desempaquetar el mensaje (la salida) desde el
+			 * servicio invocado indicandole el tipo de bean correspondiente
+			 */
+			.unmarshal(new JacksonDataFormat(Employee.class))
+			/*
+			 * Se toma el bean de salida de la rutina y se setea en la salida de esta rutina
+			 */
+			.process(new Processor() {
+				@Override
+				public void process(Exchange exchange) throws Exception {
+					Employee salida = exchange.getIn().getBody(Employee.class);
+					exchange.getOut().setBody(salida);
+				}
+			})
+			/*
+			 * Se despliega el contenido obtenido del mensaje
+			 */
+			.log("Salida Servicio GET > ${body}")
+			/*
+			 * Se finaliza esta rutina
+			 */
+			.end()
+
 		;
 
 
